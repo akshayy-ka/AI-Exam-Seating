@@ -1,0 +1,3 @@
+# Dependencies for AI Examination Seating Arrangement Using CSP
+flask>=3.0.0
+gunicorn>=21.2.0

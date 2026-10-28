@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Examination Seating Arrangement</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Google Fonts: Inter for clean typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <header class="app-header no-print">
+        <div class="header-container">
+            <div class="logo-area">
+                <h1 class="app-title">AI Examination Seating Arrangement</h1>
+            </div>
+            <div class="header-actions">
+                <button id="btn-load-sample" class="btn btn-outline" title="Load sample dataset (24 students, 2 rooms)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Load Sample Data
+                </button>
+                <button id="btn-reset-data" class="btn btn-ghost text-danger" title="Clear all data">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    Clear All
+                </button>
+                <button id="btn-header-generate" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Generate Seating
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Bar -->
+    <nav class="nav-bar no-print">
+        <div class="nav-container">
+            <button class="nav-tab active" data-tab="dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </button>
+            <button class="nav-tab" data-tab="students">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Students (<span id="badge-students-count">0</span>)
+            </button>
+            <button class="nav-tab" data-tab="rooms">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Rooms & Layouts (<span id="badge-rooms-count">0</span>)
+            </button>
+            <button class="nav-tab" data-tab="constraints">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Seating Constraints
+            </button>
+            <button class="nav-tab" data-tab="results">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Seating Chart & Visualizer
+            </button>
+        </div>
+    </nav>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- ============================================================== -->
+        <!-- TAB 1: DASHBOARD -->
+        <!-- ============================================================== -->
+        <section id="tab-dashboard" class="tab-pane active">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Examination Overview</h2>
+                    <p class="section-subtitle">Real-time status of students, rooms, and constraint-satisfaction seating allocation.</p>
+                </div>
+                <div class="header-buttons">
+                    <button id="btn-dashboard-load-sample" class="btn btn-outline" title="Load sample dataset (24 students, 2 rooms)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Load Sample Data
+                    </button>
+                    <button id="btn-dashboard-generate" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Generate Seating
+                    </button>
+                </div>
+            </div>
+
+            <!-- Metric Cards Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue-subtle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Total Students</span>
+                        <h3 class="stat-value" id="stat-students">0</h3>
+                        <span class="stat-subtext" id="stat-subjects-sub">0 distinct subject(s)</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-indigo-subtle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Exam Rooms</span>
+                        <h3 class="stat-value" id="stat-rooms">0</h3>
+                        <span class="stat-subtext" id="stat-rooms-sub">Configured halls</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-emerald-subtle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Available Seats</span>
+                        <h3 class="stat-value" id="stat-seats">0</h3>
+                        <span class="stat-subtext" id="stat-seats-sub">0 unavailable/broken</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon bg-amber-subtle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Arrangement Status</span>
+                        <h3 class="stat-value" id="stat-assigned">0 / 0</h3>
+                        <span class="stat-subtext" id="stat-status-badge">No arrangement generated</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Details Grid -->
+            <div class="grid-2-cols mt-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Enrolled Subjects Distribution</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="subject-tags-container" class="subject-tags-flex">
+                            <span class="text-slate-500 text-sm">No students registered yet.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Examination Room Capacities</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="dashboard-rooms-list" class="space-y-3">
+                            <span class="text-slate-500 text-sm">No rooms configured.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: STUDENTS MANAGEMENT -->
+        <!-- ============================================================== -->
+        <section id="tab-students" class="tab-pane">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Student Management</h2>
+                    <p class="section-subtitle">Register, edit, delete, or bulk-import students taking the examinations.</p>
+                </div>
+                <div class="header-buttons">
+                    <button id="btn-open-add-student" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Student
+                    </button>
+                    <button id="btn-open-bulk-students" class="btn btn-outline">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Bulk Import
+                    </button>
+                    <button id="btn-clear-students" class="btn btn-ghost text-danger">Clear All</button>
+                </div>
+            </div>
+
+            <!-- Student Filter Bar -->
+            <div class="filter-bar card p-3 mb-4">
+                <div class="filter-grid">
+                    <div class="search-input-wrap">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="student-search-input" placeholder="Search by ID, name, or subject..." class="form-control">
+                    </div>
+                    <select id="student-subject-filter" class="form-control">
+                        <option value="">All Subjects</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Student Table Card -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="data-table" id="students-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 140px;">Student ID</th>
+                                <th>Student Name</th>
+                                <th>Exam Subject</th>
+                                <th>Assigned Seat</th>
+                                <th style="width: 180px;" class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                            <tr>
+                                <td colspan="5" class="text-center text-slate-500 py-8">
+                                    No students loaded. Click <strong>"Add Student"</strong> or <strong>"Bulk Import"</strong>.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- TAB 3: ROOMS & LAYOUTS -->
+        <!-- ============================================================== -->
+        <section id="tab-rooms" class="tab-pane">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Examination Rooms & Seat Layouts</h2>
+                    <p class="section-subtitle">Configure examination halls, grid dimensions, and click seats to mark them unavailable (broken / pillar).</p>
+                </div>
+                <div class="header-buttons">
+                    <button id="btn-open-add-room" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Room
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions Notice -->
+            <div class="notice-box mb-6">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <div>
+                    <strong>Interactive Room Seat Editor:</strong> Click on any seat in a room grid below to toggle its status between
+                    <span class="badge badge-available">Available</span> and <span class="badge badge-unavailable">Unavailable / Blocked</span>. The CSP solver will never assign a student to an unavailable seat!
+                </div>
+            </div>
+
+            <!-- Rooms Container -->
+            <div id="rooms-cards-container" class="space-y-6">
+                <!-- Dynamically populated room cards -->
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- TAB 4: SEATING CONSTRAINTS -->
+        <!-- ============================================================== -->
+        <section id="tab-constraints" class="tab-pane">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Seating Separation Constraints</h2>
+                    <p class="section-subtitle">Configure spatial separation rules to prevent cheating between students taking the same exam subject.</p>
+                </div>
+                <div class="header-buttons">
+                    <button id="btn-save-constraints" class="btn btn-primary">Save Settings</button>
+                    <button id="btn-reset-constraints" class="btn btn-outline">Reset to Defaults</button>
+                </div>
+            </div>
+
+            <div class="space-y-6" style="max-width: 760px; margin: 0 auto;">
+                <!-- Card 1: Spatial Separation Constraints -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Same-Subject Adjacency Rules (Hard Constraints)</h3>
+                    </div>
+                    <div class="card-body space-y-4">
+                        <p class="text-sm text-slate-600 mb-4">
+                            Prevent students taking the same exam paper from sitting adjacent to one another in examination halls.
+                        </p>
+
+                        <div class="toggle-row">
+                            <div>
+                                <label class="toggle-label font-medium text-slate-800" for="cfg-horizontal">Prevent Horizontal Adjacency</label>
+                                <p class="text-xs text-slate-500">Students taking the same subject cannot sit side-by-side in the same row.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="cfg-horizontal" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div>
+                                <label class="toggle-label font-medium text-slate-800" for="cfg-vertical">Prevent Vertical Adjacency</label>
+                                <p class="text-xs text-slate-500">Students taking the same subject cannot sit directly in front or behind each other.</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="cfg-vertical" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div>
+                                <label class="toggle-label font-medium text-slate-800" for="cfg-diagonal">Prevent Diagonal Adjacency</label>
+                                <p class="text-xs text-slate-500">Students taking the same subject cannot sit diagonally adjacent (strict mode, disabled by default).</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="cfg-diagonal">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: AI Search Heuristics (MRV & Forward Checking) -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">AI Search Heuristics (CSP Optimization & Demonstration)</h3>
+                    </div>
+                    <div class="card-body space-y-4">
+                        <p class="text-sm text-slate-600 mb-4">
+                            Configure intelligent variable ordering and constraint propagation in the backtracking engine. Toggle these during demonstration to compare search steps and performance.
+                        </p>
+
+                        <div class="toggle-row">
+                            <div>
+                                <label class="toggle-label font-medium text-slate-800" for="cfg-mrv">Minimum Remaining Values (MRV) Heuristic</label>
+                                <p class="text-xs text-slate-500">
+                                    <strong>Fail-First Principle:</strong> Selects the unassigned student with the fewest legal seats left in their domain. Resolves tightly constrained students early, pruning dead ends near the root of the search tree.
+                                </p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="cfg-mrv" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div>
+                                <label class="toggle-label font-medium text-slate-800" for="cfg-fc">Forward Checking (FC) Domain Inference</label>
+                                <p class="text-xs text-slate-500">
+                                    <strong>Constraint Propagation:</strong> Immediately removes assigned seats from all students, and removes adjacent seats from students taking the same exam paper. Triggers instant backtracking upon <em>Domain Wipeout</em> (0 seats left).
+                                </p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="cfg-fc" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Educational Viva Guide -->
+                <div class="card" style="background-color: #f8fafc; border-color: #cbd5e1;">
+                    <div class="card-header">
+                        <h3 class="card-title" style="color: #1e3a8a; font-size: 0.95rem;">🎓 Examiner & Viva Demonstration Guide</h3>
+                    </div>
+                    <div class="card-body text-xs text-slate-700 space-y-2">
+                        <p><strong>1. Why Backtracking with CSP?</strong> Brute-force generates \(O(D^N)\) states, which explodes with real examination classes. CSP models each student as variable \(X_i\) and seats as domain \(D_i\). Backtracking performs a systematic Depth-First Search with early pruning.</p>
+                        <p><strong>2. Demonstrating MRV:</strong> If a student has special room restrictions or fewer available seats, MRV chooses them first: \(\arg\min_{S} |D(S)|\). If they cannot be seated, the solver fails immediately without wasting millions of combinations on unconstrained students.</p>
+                        <p><strong>3. Demonstrating Forward Checking:</strong> Without FC, standard backtracking places a student and only checks consistency with already-assigned seats. With FC, every placement looks 1 step ahead and removes invalid seats from future students, pruning search branches before recursing.</p>
+                        <p><strong>4. Live Demonstration Tip:</strong> On a dense seating problem, compare the step count with MRV & FC enabled vs. disabled to highlight algorithmic speedup!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================================================== -->
+        <!-- TAB 5: SEATING CHART & VISUALIZER -->
+        <!-- ============================================================== -->
+        <section id="tab-results" class="tab-pane">
+            <div class="section-header no-print">
+                <div>
+                    <h2 class="section-title">Examination Seating Chart</h2>
+                    <p class="section-subtitle">Visual grid representation of student seat allocations per room.</p>
+                </div>
+                <div class="header-buttons">
+                    <button id="btn-print-seating" class="btn btn-outline" title="Print seating charts">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        Print Chart
+                    </button>
+                    <button id="btn-download-csv" class="btn btn-outline" title="Export arrangement to CSV">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export CSV
+                    </button>
+                    <button id="btn-generate-results-tab" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Re-Generate
+                    </button>
+                </div>
+            </div>
+
+            <!-- Execution Status Banner (Success / Failure / Diagnostics) -->
+            <div id="results-status-card" class="card mb-6">
+                <div class="card-body">
+                    <div id="results-status-content" class="text-slate-600">
+                        No seating arrangement has been generated yet. Click <strong>"Generate Seating"</strong> to run the CSP solver.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Printable Header (Visible only when printing) -->
+            <div class="printable-header print-only">
+                <h1>College Examination Seating Arrangement</h1>
+                <p>Generated via Artificial Intelligence Constraint Satisfaction Problem (CSP) Engine</p>
+                <div class="print-meta" id="print-meta-info"></div>
+            </div>
+
+            <!-- Visual Grid Container -->
+            <div id="seating-chart-container" class="space-y-8">
+                <!-- Populated dynamically with room seat grids -->
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- ============================================================== -->
+    <!-- MODALS -->
+    <!-- ============================================================== -->
+
+    <!-- Add/Edit Student Modal -->
+    <div id="modal-student" class="modal-backdrop">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-student-title">Add Student</h3>
+                <button class="modal-close" id="btn-close-student-modal">&times;</button>
+            </div>
+            <form id="form-student">
+                <div class="modal-body space-y-4">
+                    <div class="form-group">
+                        <label class="form-label" for="inp-student-id">Student ID / Roll No. *</label>
+                        <input type="text" id="inp-student-id" class="form-control" placeholder="e.g. 24CS01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inp-student-name">Full Name *</label>
+                        <input type="text" id="inp-student-name" class="form-control" placeholder="e.g. Alice Smith" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inp-student-subject">Examination Subject *</label>
+                        <input type="text" id="inp-student-subject" class="form-control" placeholder="e.g. Artificial Intelligence" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-student">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-student">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bulk Import Students Modal -->
+    <div id="modal-bulk" class="modal-backdrop">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-header">
+                <h3 class="modal-title">Bulk Import Students</h3>
+                <button class="modal-close" id="btn-close-bulk-modal">&times;</button>
+            </div>
+            <form id="form-bulk">
+                <div class="modal-body space-y-4">
+                    <p class="text-sm text-slate-600">
+                        Paste student details below. Format each line as: <br>
+                        <code>StudentID, Full Name, Subject</code>
+                    </p>
+                    <div class="form-group">
+                        <textarea id="inp-bulk-text" rows="10" class="form-control font-mono text-sm" placeholder="24CS01, Aarav Sharma, Artificial Intelligence&#10;24CS02, Ananya Iyer, Artificial Intelligence&#10;24CS03, Rahul Nair, Operating Systems"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-bulk">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Import Students</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Room Modal -->
+    <div id="modal-room" class="modal-backdrop">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-room-title">Add Examination Room</h3>
+                <button class="modal-close" id="btn-close-room-modal">&times;</button>
+            </div>
+            <form id="form-room">
+                <div class="modal-body space-y-4">
+                    <div class="form-group">
+                        <label class="form-label" for="inp-room-id">Room ID *</label>
+                        <input type="text" id="inp-room-id" class="form-control" placeholder="e.g. HALL_101" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inp-room-name">Room / Hall Name *</label>
+                        <input type="text" id="inp-room-name" class="form-control" placeholder="e.g. LH-101 (Main Auditorium)" required>
+                    </div>
+                    <div class="grid-2-cols">
+                        <div class="form-group">
+                            <label class="form-label" for="inp-room-rows">Number of Rows *</label>
+                            <input type="number" id="inp-room-rows" class="form-control" min="1" max="20" value="4" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inp-room-cols">Number of Columns *</label>
+                            <input type="number" id="inp-room-cols" class="form-control" min="1" max="20" value="4" required>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500">
+                        Note: Once the room is saved, you can click any seat directly on its grid to mark it unavailable/broken.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-room">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reassign / Change Seat Modal -->
+    <div id="modal-reassign" class="modal-backdrop">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Manual Seat Reassignment</h3>
+                <button class="modal-close" id="btn-close-reassign-modal">&times;</button>
+            </div>
+            <form id="form-reassign">
+                <div class="modal-body space-y-4">
+                    <!-- Current Student Info Card -->
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded" id="reassign-student-info">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Mode Toggle -->
+                    <div class="form-group">
+                        <label class="form-label">Action Mode</label>
+                        <div style="display: flex; gap: 1.5rem; margin-top: 0.25rem;">
+                            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.875rem; cursor: pointer;">
+                                <input type="radio" name="reassign-mode" value="move" checked id="radio-mode-move">
+                                <span>Move to a seat</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.875rem; cursor: pointer;">
+                                <input type="radio" name="reassign-mode" value="swap" id="radio-mode-swap">
+                                <span>Swap with another student</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Target Seat Selector (Move mode) -->
+                    <div id="reassign-move-section" class="space-y-3">
+                        <div class="form-group">
+                            <label class="form-label" for="sel-reassign-room">Target Room</label>
+                            <select id="sel-reassign-room" class="form-control"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="sel-reassign-seat">Target Seat</label>
+                            <select id="sel-reassign-seat" class="form-control"></select>
+                        </div>
+                    </div>
+
+                    <!-- Target Student Selector (Swap mode) -->
+                    <div id="reassign-swap-section" class="space-y-3" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label" for="sel-reassign-student">Select Student to Swap With</label>
+                            <select id="sel-reassign-student" class="form-control"></select>
+                        </div>
+                    </div>
+
+                    <!-- Constraint Violation Alert Container -->
+                    <div id="reassign-error-container" style="display: none;" class="notice-box text-sm p-3 bg-red-50 border-red-200 text-red-700">
+                        <!-- Populated if violations occur -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-reassign">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-reassign">Verify & Apply Change</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
